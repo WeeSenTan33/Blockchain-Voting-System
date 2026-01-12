@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Enter OTP</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #B6CEB4, #D9E9CF);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .card {
+      display: flex;
+      width: 1575px;
+      height: 675px;
+      background: white;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    }
+
+    .left {
+      flex: 3;
+      background: url('/image/Campus_UPNM.jpg') center center no-repeat;
+      background-size: cover;
+    }
+
+    .right {
+      flex: 2;
+      padding: 50px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .header img {
+      max-width: 110px;
+      height: auto;
+    }
+
+    .header h1 {
+      font-size: 80px;
+      font-weight: 700;
+      color: #000;
+    }
+
+    .right h2 {
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+
+    .right p {
+      font-size: 13px;
+      margin-bottom: 20px;
+      text-align: center;
+      color: #444;
+    }
+
+    .form-group {
+      width: 100%;
+      max-width: 320px;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .otp-boxes {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+
+    .otp-boxes input {
+      width: 40px;
+      height: 50px;
+      font-size: 24px;
+      text-align: center;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .otp-boxes input:focus {
+      border-color: #5a5fe7;
+      box-shadow: 0 0 5px rgba(90, 95, 231, 0.4);
+    }
+
+    button {
+      padding: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      background-color: #9698db;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background-color: #5a5fe7;
+    }
+
+    #status {
+      margin-top: 12px;
+      color: red;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .resend {
+      margin-top: 14px;
+      font-size: 13px;
+      color: #333;
+      text-align: center;
+    }
+
+    .resend button {
+      margin-left: 8px;
+      background: none;
+      color: #5a5fe7;
+      text-decoration: underline;
+      border: none;
+      cursor: pointer;
+      font-size: 13px;
+      padding: 0;
+    }
+
+    .resend button:hover {
+      color: #3f47cc;
+    }
+  </style>
+</head>
+
+<body>
+   <div class="card">
+    <div class="left"></div>
+    <div class="right">
+      <div class="header">
+        <img src="/image/Logo_UPNM.png" alt="UPNM Logo">
+        <h1>SPMPP</h1>
+      </div>
+
+      <h2>Verify OTP</h2>
+      <p>Please enter the 6-digit code sent to your email.</p>
+
+      <div class="form-group">
+        <div class="otp-boxes" id="otpInputs">
+          <input type="text" maxlength="1" oninput="moveNext(this, 0)">
+          <input type="text" maxlength="1" oninput="moveNext(this, 1)">
+          <input type="text" maxlength="1" oninput="moveNext(this, 2)">
+          <input type="text" maxlength="1" oninput="moveNext(this, 3)">
+          <input type="text" maxlength="1" oninput="moveNext(this, 4)">
+          <input type="text" maxlength="1" oninput="moveNext(this, 5)">
+        </div>
+        <button onclick="verifyOtp()">Verify</button>
+        <p id="status"></p>
+
+        <div class="resend">
+          Didn't receive the code?
+          <button onclick="resendOtp()">Resend OTP</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function moveNext(input, index) {
+      const inputs = document.querySelectorAll('#otpInputs input');
+
+      if (input.value.length === 1 && index < inputs.length - 1) {
+        inputs[index + 1].focus();
+      }
+
+      if (input.value.length === 0 && index > 0 && event.inputType === 'deleteContentBackward') {
+        inputs[index - 1].focus();
+      }
+    }
+
+    async function verifyOtp() {
+      const email = new URLSearchParams(window.location.search).get('email');
+      const inputs = document.querySelectorAll('#otpInputs input');
+      const otp = Array.from(inputs).map(input => input.value).join('');
+
+      if (otp.length !== 6) {
+        document.getElementById('status').innerText = 'Please enter a valid 6-digit OTP.';
+        return;
+      }
+
+      try {
+        const res = await fetch('/auth/verify-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, otp })
+        });
+
+        const data = await res.json();
+        document.getElementById('status').innerText = data.message || data.error;
+
+        if (data.success) {
+          localStorage.setItem('voterEmail', email);
+          localStorage.setItem('userRole', data.role);
+
+          const redirectUrl = data.role === 'ADMIN' ? '/admin_homepage.html' :
+                              data.role === 'CANDIDATE' ? '/candidate_homepage.html' :
+                              '/voter_homepage.html';
+
+          window.location.replace(redirectUrl + '?email=' + encodeURIComponent(email));
+        }
+
+      } catch (error) {
+        document.getElementById('status').innerText = 'Failed to verify OTP. Please try again.';
+      }
+    }
+
+    async function resendOtp() {
+      const params = new URLSearchParams(window.location.search);
+      const email = params.get('email');
+
+      if (!email) {
+        document.getElementById('status').innerText = 'Email not found. Please restart login.';
+        return;
+      }
+
+      try {
+        const res = await fetch('/auth/request-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+
+        const data = await res.json();
+        console.log('🔁 Resend OTP response:', data);
+
+        document.getElementById('status').innerText = data.message || data.error;
+
+        //Clear all OTP input boxes
+        const inputs = document.querySelectorAll('#otpInputs input');
+        inputs.forEach(input => input.value = '');
+
+        //Set focus back to first box
+        if (inputs.length > 0) {
+          inputs[0].focus();
+        }
+
+      } catch (error) {
+        console.error('❌ Resend OTP failed:', error);
+        document.getElementById('status').innerText = 'Failed to resend OTP. Please try again.';
+      }
+
+      // Add this at the bottom of your script section
+      window.onload = function() {
+          // 1. Wipe all OTP boxes immediately on page load
+        const inputs = document.querySelectorAll('#otpInputs input');
+        inputs.forEach(input => input.value = '');
+        if (inputs.length > 0) inputs[0].focus();
+
+        // 2. Lock the history so "Forward" doesn't work after logging out
+        if (window.history && window.history.pushState) {
+          window.history.pushState('forward', null, './otp.html');
+          window.onpopstate = function() {
+              window.history.pushState('forward', null, './otp.html');
+              // Redirect them to login if they try to mess with the back button here
+              window.location.replace('/login.html');
+          };
+        }
+      };
+    }
+    
+  </script>
+</body>
+</html>

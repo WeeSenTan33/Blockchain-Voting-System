@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Create Voting</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #B6CEB4, #D9E9CF);
+      color: #111827;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 60px;
+      background-color: #ffffff;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .logo img {
+      height: 75px;
+      width: auto;
+    }
+
+    .logo-text {
+      font-size: 50px;
+      font-weight: 750;
+      color: #1f2937;
+    }
+  </style>
+</head>
+<body>
+  <h2>🗳️ Create Voting Session</h2>
+
+  <label>Voting Title</label>
+  <input type="text" id="title" placeholder="e.g. Student Council 2025" />
+
+  <label>Start Time</label>
+  <input type="datetime-local" id="startTime" />
+
+  <label>End Time</label>
+  <input type="datetime-local" id="endTime" />
+
+  <label>Contract Address</label>
+  <div style="display: flex; gap: 10px; margin-bottom: 5px;">
+    <input type="text" id="contractAddress" placeholder="Deploying generates this..." style="margin-bottom: 0;" readonly />
+    <button type="button" class="btn" style="width: auto; margin-top: 0; background-color: #10b981;" onclick="deployContract()">Generate</button>
+  </div>
+
+  <button onclick="submit()">Create Voting</button>
+  <p id="status"></p>
+
+  <script>
+    async function deployContract() {
+      const statusEl = document.getElementById('status');
+      const contractInput = document.getElementById('contractAddress');
+
+      statusEl.textContent = "⏳ Generating contract address... please wait.";
+      statusEl.style.color = "#1f2937";
+
+      try {
+        const res = await fetch('/admin/deploy-contract', { method: 'POST' });
+        const data = await res.json();
+
+        if (data.success) {
+          contractInput.value = data.address; // Auto-fill the address box
+          statusEl.textContent = "✅ Deployment Successful!";
+          statusEl.style.color = "green";
+        } else {
+          statusEl.textContent = "❌ " + data.error;
+          statusEl.style.color = "red";
+        }
+      } catch (err) {
+        statusEl.textContent = "❌ Network error during deployment.";
+        statusEl.style.color = "red";
+      }
+    }
+
+    async function submit() {
+      const title = document.getElementById('title').value;
+      const start = document.getElementById('startTime').value;
+      const end   = document.getElementById('endTime').value;
+      const contract_address = document.getElementById('contractAddress').value;
+
+      const res = await fetch('/admin/create-voting', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, start, end, contract_address })
+      });
+
+      const result = await res.json();
+      document.getElementById('status').textContent = result.message || result.error;
+    }
+  </script>
+</body>
+</html>

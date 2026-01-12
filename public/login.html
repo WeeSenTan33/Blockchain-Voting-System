@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>SPMPP</title>
+  <style>
+      * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #B6CEB4, #D9E9CF);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .card {
+      display: flex;
+      width: 1575px; /* Wider to fit image + login form */
+      height: 675px;
+      background: rgb(254, 252, 252);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    }
+
+    .left {
+      flex: 3;
+      background: url('/image/Campus_UPNM.jpg') center center no-repeat;
+      background-size: cover;
+    }
+
+    .right {
+      flex: 2;
+      padding: 50px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .header img {
+      max-width: 110px;
+      height: auto;
+    }
+
+    .header h1 {
+      font-size: 80px;
+      font-weight: 700;
+      color: #000;
+    }
+
+    .right h2 {
+      margin-bottom: 8px;
+      font-size: 22px;
+    }
+
+    .right p {
+      font-size: 13px;
+      margin-bottom: 25px;
+      text-align: center;
+      color: #444;
+    }
+
+    .form-group {
+      width: 100%;
+      max-width: 320px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    input[type="email"] {
+      padding: 10px 12px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      margin-bottom: 14px;
+    }
+
+    button {
+      padding: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      background-color: #9698db;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background-color: #5a5fe7;
+    }
+
+    #status {
+      margin-top: 12px;
+      color: red;
+      font-size: 13px;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <div class="left"></div>
+
+    <div class="right">
+      <div class="header">
+        <img src="/image/Logo_UPNM.png" alt="UPNM Logo">
+        <h1>SPMPP</h1>
+      </div>
+
+      <h2>Welcome Back!</h2>
+      <p>Please enter your Alfateh email to get the OTP</p>
+      <div class="form-group">
+        <input type="email" id="email" placeholder="e.g. 1234567@alfateh.upnm.edu.my">
+        <button onclick="requestOtp()">Request OTP</button>
+        <p id="status"></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    async function requestOtp() {
+      const email = document.getElementById('email').value;
+
+      const res = await fetch('/auth/request-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+
+      const data = await res.json();
+      document.getElementById('status').innerText = data.message || data.error;
+
+      if (data.success) {
+        window.location.href = '/otp.html?email=' + encodeURIComponent(email);
+      }
+    }
+  </script>
+</body>
+</html>

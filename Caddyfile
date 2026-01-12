@@ -1,0 +1,3 @@
+172.53.223.175 {
+    reverse_proxy localhost:8000
+}

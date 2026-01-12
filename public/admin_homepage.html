@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Home</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #B6CEB4, #D9E9CF);
+      color: #111827;
+      min-height: 100vh;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 60px;
+      background-color: #ffffff;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .logo img {
+      height: 75px;
+      width: auto;
+    }
+
+    .logo-text {
+      font-size: 50px;
+      font-weight: 750;
+      color: #1f2937;
+    }
+
+    .user-dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .dropbtn {
+      background-color: transparent;
+      color: #4b5563;
+      font-size: 16px;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+      font-family: inherit;
+    }
+
+    .dropbtn:hover {
+      color: #2563eb;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: #ffffff;
+      min-width: 160px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      z-index: 1;
+      right: 0;
+    }
+
+    .dropdown-content a {
+      color: #1f2937;
+      padding: 10px 16px;
+      text-decoration: none;
+      display: block;
+    }
+
+    .dropdown-content a:hover {
+      background-color: #f3f4f6;
+    }
+
+    .user-dropdown:hover .dropdown-content {
+      display: block;
+    }
+
+    .main {
+      padding: 40px 60px;
+    }
+
+    /*h1 {
+      font-size: 42px;
+      color: #1f2937;
+      margin-bottom: 20px;
+    }*/
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 24px;
+    }
+
+    .container {
+      background-color: rgba(255, 255, 255, 0.4);
+      border: 1px solid #111827;
+      border-radius: 40px;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .container h3 {
+      font-size: 20px;
+      color: #111827;
+    }
+
+    .button-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .btn {
+      width: 100%; /* Admin buttons usually look better full-width in their capsule */
+      max-width: 250px;
+      text-align: center;
+      background-color: #2563eb;
+      color: white;
+      padding: 12px 24px;
+      font-size: 15px;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn:hover {
+      background-color: #1e40af;
+    }
+
+    .btn.muted {
+      background-color: #ffffff;
+      color: #1f2937;
+      border: 1px solid #d1d5db;
+    }
+
+    .btn.muted:hover {
+      background-color: #f3f4f6;
+    }
+
+    #pendingCount {
+      font-weight: bold;
+      color: #2563eb;
+    }
+
+    .popup-overlay {
+      display: none; /* Hidden by default */
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(5px); /* Creates the blur effect */
+      z-index: 1000;
+      justify-content: center; align-items: center;
+    }
+
+    .popup-content {
+      background: white;
+      width: 90%;
+      max-width: 500px;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid #111827;
+      animation: popIn 0.3s ease-out;
+    }
+
+    .popup-header {
+      background: #374151;
+      color: white;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .close-button { 
+      background:none; 
+      border:none; 
+      color:white; 
+      cursor:pointer; 
+      font-size:20px; 
+    }
+
+    .popup-body { 
+      padding: 25px; 
+      display: flex; 
+      flex-direction: column; 
+      gap: 12px; 
+    }
+
+    .popup-body label { 
+      font-weight: 600; 
+      font-size: 14px; 
+      text-align: left; 
+    }
+
+    .popup-body input { 
+      padding: 10px; 
+      border: 1px solid #d1d5db; 
+      border-radius: 8px; 
+      font-family: inherit; 
+    }
+    
+    .time-row { 
+      display: grid; 
+      grid-template-columns: 1fr 1fr; 
+      gap: 10px; 
+    }
+
+    .generate-row { 
+      display: flex; 
+      gap: 10px; 
+    }
+    
+    .success-small { 
+      background-color: #10b981; 
+      color: white; 
+      padding: 8px 12px; 
+      border: none; 
+      border-radius: 8px; 
+      cursor: pointer; 
+      font-size: 13px; 
+      font-weight: 600; 
+    }
+
+    .submitCreateSession { 
+      background-color: #2563eb; 
+      color: white; 
+      border: none; 
+      padding: 14px; 
+      border-radius: 8px; 
+      cursor: pointer; 
+      font-weight: 600; 
+      width: 100%; 
+    }
+
+    @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <img src="/image/Logo_UPNM.png" alt="UPNM Logo">
+      <span class="logo-text">SPMPP</span>
+    </div>
+  
+    <div class="user-dropdown">
+      <button class="dropbtn" id="emailBtn">email@upnm.edu.my</button>
+      <div class="dropdown-content">
+        <a href="#" onclick="logout()">Log out</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="main">
+    <div class="grid">
+      <div class="container">
+        <h3>Voter Management</h3>
+        <p>Pending verifications: <span id="pendingCount">—</span></p>
+        <div class="button-group">
+          <button class="btn" id="openDashboard">Open Admin Dashboard</button>
+        </div>
+      </div>
+
+      <div class="container">
+        <h3>User Management</h3>
+        <div class="button-group">
+          <button class="btn muted" id="manageRole">Manage Roles</button>
+          <button class="btn muted" id="manageCandidate">Manage Candidates</button>
+        </div>
+      </div>
+
+      <div class="container">
+        <h3>Voting Configuration</h3>
+        <div class="button-group">
+          <button class="btn muted" id="createVoting">Create Voting Session</button>
+          <button class="btn muted" id="extendVoting">Extend Voting Time</button>
+          <button class="btn" id="viewResults">View Results</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="createSessionPopup" class="popup-overlay">
+    <div class="popup-content">
+      <div class="popup-header">
+        <span>New Voting Session</span>
+        <button class="close-button" onclick="closeSessionPopup()">X</button>
+      </div>
+      <div class="popup-body">
+        <label>Voting Title</label>
+        <input type="text" id="sessionTitle" placeholder="e.g. Student Council 2025">
+
+        <div class="time-row">
+          <div>
+            <label>Start Time</label>
+            <input type="datetime-local" id="sessionStart" style="width:100%">
+          </div>
+          <div>
+            <label>End Time</label>
+            <input type="datetime-local" id="sessionEnd" style="width:100%">
+          </div>
+        </div>
+
+        <label>Contract Address</label>
+        <div class="generate-row">
+          <input type="text" id="sessionContract" placeholder="0x..." readonly style="flex:1">
+          <button class="success-small" onclick="deployContract()">Generate</button>
+        </div>
+
+        <button class="submitCreateSession" onclick="submitSession()">Create session</button>
+        <p id="submitSessionStatus" style="text-align:center; font-size:13px; margin-top:10px;"></p>
+      </div>
+    </div>
+  </div>
+
+  <div id="extendVotingPopup" class="popup-overlay">
+    <div class="popup-content">
+      <div class="popup-header">
+        <span>Extend Voting Time</span>
+        <button class="close-button" onclick="closeExtendPopup()">X</button>
+      </div>
+      <div class="popup-body">
+        <label>New End Time:</label>
+        <input type="datetime-local" id="newEndTime" style="width:100%" onfocus="this.showPicker()" />
+
+        <button class="submitCreateSession" onclick="extend()">Update End Time</button>
+        <p id="extendStatus" style="text-align:center; font-size:13px; margin-top:10px;"></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      const userEmail = localStorage.getItem('voterEmail');
+
+      if (userEmail) {
+          window.history.pushState(null, null, window.location.href);
+          window.onpopstate = function() {
+            localStorage.clear();
+            window.location.replace('/login.html');
+          };
+      } else {
+          // If they aren't logged in, send them to login immediately
+          window.location.replace('/login.html');
+      }
+    })();
+    
+    const email = localStorage.getItem('voterEmail');
+    const role  = localStorage.getItem('userRole') || 'ADMIN';
+    
+    if (email) {
+      document.getElementById('emailBtn').textContent = `${email} ▾`;
+    }
+
+    // role guard
+    if (role !== 'ADMIN') {
+      window.location.href = role === 'CANDIDATE' ? '/candidate_homepage.html'
+                         : '/voter_homepage.html';
+    }
+
+    function logout() {
+      localStorage.clear();
+      window.location.replace('/login.html');
+    }
+
+    async function loadPendingCount() {
+      try {
+        const res = await fetch('/admin/pending-voters');
+        if (!res.ok) throw 0;
+        const rows = await res.json();
+        document.getElementById('pendingCount').textContent = rows.length;
+      } catch {
+        document.getElementById('pendingCount').textContent = '—';
+      }
+    }
+
+    // buttons
+    document.getElementById('openDashboard').onclick   = () => window.location.href = '/admin_dashboard.html';
+    document.getElementById('manageRole').onclick = () => window.location.href = '/manageRole.html';
+    document.getElementById('manageCandidate').onclick = () => window.location.href = '/manageCandidate.html';
+    document.getElementById('createVoting').onclick = createSessionPopup;
+
+    //Create Voting Session
+    document.getElementById('createVoting').onclick = openSession;
+
+    function openSession() {
+      const now = new Date().toISOString().slice(0, 16); // Get current date
+      // blur past time for Start and End time
+      document.getElementById('sessionStart').min = now;
+      document.getElementById('sessionEnd').min = now;
+      document.getElementById('createSessionPopup').style.display = 'flex';
+    }
+
+    function closeSessionPopup() { 
+      document.getElementById('createSessionPopup').style.display = 'none'; 
+    }
+
+    async function deployContract() {
+      const status = document.getElementById('submitSessionStatus');
+      const contractInput = document.getElementById('sessionContract');
+
+      status.textContent = "⏳ Generating contract... please wait.";
+      status.style.color = "#1f2937";
+      try {
+        const res = await fetch('/admin/deploy-contract', { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+          contractInput.value = data.address;
+          status.textContent = "✅ Deployment Successful!";
+          status.style.color = "green";
+        } else {
+          status.textContent = "❌ " + (data.error || "Deployment failed");
+          status.style.color = "red";
+        }
+      } catch (e) { 
+        status.textContent = "❌ Network error."; 
+        status.style.color = "red";
+      }
+    }
+
+    async function submitSession() {
+      const title = document.getElementById('sessionTitle').value;
+      const start = document.getElementById('sessionStart').value;
+      const end   = document.getElementById('sessionEnd').value;
+      const contract_address = document.getElementById('sessionContract').value;
+      const statusEl = document.getElementById('submitSessionStatus');
+
+      const nowCheck = new Date; // Define now
+
+      // Block start time in the past
+      if (new Date(start) <= nowCheck) {
+        statusEl.textContent = "❌ Start time must be in the future.";
+        statusEl.style.color = "red";
+        return;
+      }
+
+      // Prevent past end time
+      if (new Date(end) <= nowCheck) {
+        statusEl.textContent = "❌ End time must be in the future.";
+        statusEl.style.color = "red";
+        return;
+      }
+
+      // Ensure end is after start
+      if (new Date(end) <= new Date(start)) {
+        statusEl.textContent = "❌ End time must be after the Start time.";
+        statusEl.style.color = "red";
+        return;
+      }
+
+      const res = await fetch('/admin/create-voting', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title, start, end, contract_address })
+      });
+
+      const result = await res.json();
+      
+      statusEl.textContent = result.message || result.error;
+      statusEl.style.color = result.success ? "green" : "red";
+
+      if (result.success) {
+        alert("Voting Session Created!");
+        location.reload(); // Refresh to see the new session
+      }
+    }
+    // ------------------------------------------------------------------------------
+
+
+    // Extend Voting Session
+    document.getElementById('extendVoting').onclick = openExtendPopup;
+
+    function openExtendPopup() {
+        // Get current date
+        const now = new Date().toISOString().slice(0, 16); // Get current date
+        document.getElementById('newEndTime').setAttribute('min', now); // Blur past date
+        document.getElementById('extendVotingPopup').style.display = 'flex';
+    }
+
+    function closeExtendPopup() {
+        document.getElementById('extendVotingPopup').style.display = 'none';
+    }
+
+    async function extend() {
+      const newEndTime = document.getElementById('newEndTime').value;
+      const statusEl = document.getElementById('extendStatus');
+
+      // Prevent past time
+      if (new Date(newEndTime) <= new Date()) {
+        statusEl.textContent = "❌ Cannot choose a past time.";
+        statusEl.style.color = "red";
+        return; // Stops the function here
+      }
+
+      const res = await fetch('/admin/extend-voting', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ newEndTime })
+      });
+
+      const result = await res.json();
+      
+      // Show the result message inside the popup
+      statusEl.textContent = result.message || result.error;
+      statusEl.style.color = result.success ? "green" : "red";
+
+      if (result.success) {
+          alert("Voting time extended!");
+          location.reload(); 
+      }
+    }
+
+    document.getElementById('viewResults').onclick = () => window.location.href = '/votingResult.html';
+    loadPendingCount();
+  </script>
+</body>
+</html>

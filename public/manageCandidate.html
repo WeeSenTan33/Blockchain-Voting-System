@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Candidate List</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #B6CEB4, #D9E9CF);
+      overflow: hidden;
+    }
+
+    .header-container {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin: 16px;
+    }
+
+    .back-btn {
+      padding: 10px 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background: #111;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+
+    h2 {
+      margin: 16px;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .table-wrapper {
+      flex: 1;
+      overflow-y: auto;
+      margin: 0 16px 16px 16px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.08);
+      background: #fff;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 12px 14px;
+      border-bottom: 1px solid #eee;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f0f0f0;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    .yes-label {
+      display: inline-block;
+      background: #e0f5e0;
+      color: #2a8b2a;
+      font-weight: bold;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      margin-right: 8px;
+    }
+
+    .view-btn {
+      padding: 5px 10px;
+      background: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      margin-right: 6px;
+    }
+
+    .remove-btn {
+      padding: 5px 10px;
+      background: #dc3545;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 9999;
+      left: 0;
+      top: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(0,0,0,0.7);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background: #fff;
+      border-radius: 10px;
+      padding: 20px;
+      max-width: 90vw;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .modal-content img {
+      max-width: 100%;
+      max-height: 80vh;
+      object-fit: contain;
+      border-radius: 8px;
+    }
+
+    .close {
+      align-self: flex-end;
+      font-size: 22px;
+      font-weight: bold;
+      color: #333;
+      cursor: pointer;
+      margin-bottom: 10px;
+    }
+
+    .close:hover {
+      color: red;
+    }
+
+    @media (max-width: 600px) {
+      .yes-label, .view-btn, .remove-btn {
+        display: block;
+        margin-bottom: 4px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header-container">
+    <button class="back-btn" onclick="goBack()">⬅</button>
+    <h2>📋 Manage Candidates</h2>
+  </div>
+
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Matric No</th>
+          <th>Name</th>
+          <th>Course</th>
+          <th>Profile</th>
+          <th>Manifesto</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="candidateBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal -->
+<div id="previewModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeModal()">&times;</span>
+    <h3 id="modalTitle" style="margin: 0 0 10px;"></h3>
+    <img id="modalImage" src="" alt="Preview" />
+  </div>
+</div>
+
+<script>
+  function goBack() {
+    window.location.href = '/voter_homepage.html';
+  }
+  
+  async function loadCandidates() {
+    const res = await fetch('/candidates');
+    const data = await res.json();
+
+    const tbody = document.getElementById('candidateBody');
+    tbody.innerHTML = '';
+
+    data.forEach(c => {
+      const tr = document.createElement('tr');
+
+      // Render profile
+      const profileHTML = c.profile_pic_url
+        ? `<span class="yes-label">Yes</span><button class="view-btn" onclick="openModal('${c.profile_pic_url}', '${c.name} – Profile')">View</button>`
+        : '—';
+
+      // Render manifesto
+      const manifestoHTML = c.manifesto_url
+        ? `<span class="yes-label">Yes</span><button class="view-btn" onclick="openModal('${c.manifesto_url}', '${c.name} – Manifesto')">View</button>`
+        : '—';
+
+      // Remove button
+      const removeHTML = `<button class="remove-btn" onclick="removeCandidate(${c.no_matric})">Remove</button>`;
+
+      tr.innerHTML = `
+        <td>${c.no_matric}</td>
+        <td>${c.name}</td>
+        <td>${c.course || '-'}</td>
+        <td>${profileHTML}</td>
+        <td>${manifestoHTML}</td>
+        <td>${removeHTML}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function openModal(url, title) {
+    document.getElementById('modalImage').src = url;
+    document.getElementById('modalTitle').innerText = title;
+    document.getElementById('previewModal').style.display = 'flex';
+  }
+
+  function closeModal() {
+    document.getElementById('previewModal').style.display = 'none';
+    document.getElementById('modalImage').src = '';
+  }
+
+  async function removeCandidate(no_matric) {
+    if (!confirm("Are you sure you want to remove this candidate?")) return;
+
+    try {
+      const res = await fetch(`/admin/remove-candidate/${no_matric}`, { method: 'DELETE' });
+      const result = await res.json();
+
+      alert(result.message || result.error || 'Done');
+      loadCandidates();
+    } catch (err) {
+      console.error(err);
+      alert("Failed to remove candidate.");
+    }
+  }
+
+  // Close modal on outside click
+  window.onclick = function(e) {
+    const modal = document.getElementById('previewModal');
+    if (e.target === modal) {
+      closeModal();
+    }
+  };
+
+  loadCandidates();
+</script>
+
+</body>
+</html>

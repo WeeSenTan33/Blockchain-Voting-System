@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Dashboard - Voter Verification</title>
+  <style>
+    body { 
+      font-family: Arial, 
+      sans-serif; padding: 20px; 
+      background: linear-gradient(to right, #B6CEB4, #D9E9CF);
+    }
+
+    .header-container {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin: 16px;
+    }
+
+    .back-btn {
+      padding: 10px 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background: #111;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+
+    h1 { 
+      margin-bottom: 20px; 
+    }
+
+    .voter-card {
+      background-color: rgba(255, 255, 255, 0.9);
+      border: 1px solid #ccc;
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    img {
+      max-height: 100px;
+      border-radius: 4px;
+      margin-right: 20px;
+    }
+    .info {
+      flex: 1;
+    }
+    .actions button {
+      margin: 0 5px;
+      padding: 6px 12px;
+    }
+
+    .zoom-modal {
+      display: none; /* Hidden until showImage is called */
+      position: fixed;
+      z-index: 9999;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.85); /* Dark background to focus on the image */
+      justify-content: center;
+      align-items: center;
+    }
+
+    #enlargedImage {
+      max-width: 90%;
+      max-height: 90%;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="header-container">
+    <button class="back-btn" onclick="goBack()">⬅</button>
+    <h1>Admin Dashboard</h1>
+  </div>
+
+  <div id="voterList">Loading pending voters...</div>
+  <div id="enlargedImageModal" class="zoom-modal" onclick="this.style.display='none'">
+    <img id="enlargedImage" src="" alt="Enlarged View">
+  </div>
+
+  <script>
+    function goBack() {
+      window.location.href = '/voter_homepage.html';
+    }
+
+    function showImage(url) {
+      document.getElementById('enlargedImage').src = url;
+      document.getElementById('enlargedImageModal').style.display = 'flex';
+    }
+
+    async function loadVoters() {
+      const res = await fetch('/admin/pending-voters');
+      const voters = await res.json();
+      const container = document.getElementById('voterList');
+      container.innerHTML = '';
+
+      if (voters.length === 0) {
+        container.innerText = 'No pending verifications.';
+        return;
+      }
+
+      voters.forEach(voter => {
+        const card = document.createElement('div');
+        card.className = 'voter-card';
+
+        card.innerHTML = `
+          <img src="${voter.matric_card_url}" onclick="showImage(this.src)" style="cursor:zoom-in">
+          <img src="${voter.selfie_url}" onclick="showImage(this.src)" style="cursor:zoom-in">
+          <div class="info">
+            <p><strong>Email:</strong> ${voter.email}</p>
+            <p><strong>Status:</strong> ${voter.status}</p>
+          </div>
+          <div class="actions">
+            <button onclick="verifyVoter('${voter.email}', 'VERIFIED')">✅ Approve</button>
+            <button onclick="verifyVoter('${voter.email}', 'REJECTED')">❌ Reject</button>
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+    }
+
+    async function verifyVoter(email, status) {
+      const res = await fetch('/admin/verify-voter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, status })
+      });
+
+      const data = await res.json();
+      alert(data.message);
+      loadVoters(); // refresh list
+    }
+
+    loadVoters();
+  </script>
+</body>
+</html>
+

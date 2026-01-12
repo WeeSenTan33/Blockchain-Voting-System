@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Voting Results</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 24px;
+      background: linear-gradient(to right, #B6CEB4, #D9E9CF);
+      max-width: 800px;
+      margin: auto;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      box-shadow: 0 0 6px rgba(0,0,0,0.1);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: 14px 16px;
+      border-bottom: 1px solid #eee;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f0f0f0;
+    }
+
+    .warning {
+      background: #fff3cd;
+      color: #856404;
+      padding: 16px;
+      border: 1px solid #ffeeba;
+      border-radius: 6px;
+      margin-bottom: 24px;
+      font-size: 16px;
+    }
+
+    .error {
+      background: #f8d7da;
+      color: #721c24;
+      padding: 16px;
+      border: 1px solid #f5c6cb;
+      border-radius: 6px;
+      margin-bottom: 24px;
+    }
+  </style>
+</head>
+<body>
+  <button onclick="goBack()" style="margin-bottom: 20px; padding: 10px 20px; cursor: pointer; border-radius: 8px; border: 1px solid #d1d5db; background: #fff; font-weight: 600;"> ⬅ </button>
+  <h2>📊 Final Voting Results</h2>
+
+  <div id="statusMessage" class="warning" style="display: none;"></div>
+
+  <table id="resultsTable" style="display: none;">
+    <thead>
+      <tr>
+        <th>Matric No</th>
+        <th>Name</th>
+        <th>Course</th>
+        <th>Vote Count</th>
+      </tr>
+    </thead>
+    <tbody id="resultsBody"></tbody>
+  </table>
+
+  <script>
+    function goBack() {
+      // 1. Get the role from storage (default to VOTER if empty)
+      const role = localStorage.getItem('userRole') || 'VOTER';
+
+      // 2. Simple logic to decide the path
+      if (role === 'ADMIN') {
+          window.location.href = '/admin_homepage.html';
+      } else if (role === 'CANDIDATE') {
+          window.location.href = '/candidate_homepage.html';
+      } else {
+          window.location.href = '/voter_homepage.html';
+      }
+  }
+    async function loadResults() {
+      const table = document.getElementById('resultsTable');
+      const tbody = document.getElementById('resultsBody');
+      const msgBox = document.getElementById('statusMessage');
+
+      try {
+        const res = await fetch('/admin/results');
+        const data = await res.json();
+
+        if (!res.ok) {
+          msgBox.textContent = data.error || 'Results are currently unavailable.';
+          msgBox.className = 'warning';
+          msgBox.style.display = 'block';
+          table.style.display = 'none';
+          return;
+        }
+
+        // Hide warning, show table
+        msgBox.style.display = 'none';
+        table.style.display = 'table';
+
+        tbody.innerHTML = '';
+        data.forEach(c => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${c.no_matric}</td>
+            <td>${c.name}</td>
+            <td>${c.course}</td>
+            <td><strong>${c.votes}</strong></td>
+          `;
+          tbody.appendChild(row);
+        });
+
+      } catch (err) {
+        msgBox.textContent = 'Something went wrong while loading results.';
+        msgBox.className = 'error';
+        msgBox.style.display = 'block';
+        table.style.display = 'none';
+      }
+    }
+
+    loadResults();
+  </script>
+
+</body>
+</html>

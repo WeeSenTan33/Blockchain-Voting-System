@@ -1,0 +1,112 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Manage User Roles</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', system-ui, Arial;
+      padding: 24px;
+      background: linear-gradient(to right, #B6CEB4, #D9E9CF);
+      color: #111827;
+    }
+
+    .header-container {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 24px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,.1);
+    }
+
+    th,td {padding:12px 14px;border-bottom:1px solid #eee;text-align:left}
+    th{background:#fafafa;color:#333}
+    tr:hover{background:#fcfcfc}
+    .row{display:flex;gap:12px;margin-bottom:16px}
+    input,select,button{padding:10px 12px;border:1px solid #ddd;border-radius:8px}
+    button{background:#111;color:#fff;border:none;cursor:pointer}
+    button:disabled{opacity:.6;cursor:not-allowed}
+    .chip{display:inline-block;padding:4px 8px;border-radius:999px;font-size:12px;background:#eef;border:1px solid #cde}
+  </style>
+</head>
+<body>
+  <div class="header-container">
+    <button class="back-btn" onclick="goBack()">⬅</button>
+    <h2>Manage User Roles</h2>
+  </div>
+
+  <div class="row">
+    <input id="search" placeholder="Search email or matric…" />
+    <select id="filterRole">
+      <option value="">All roles</option>
+      <option>ADMIN</option>
+      <option>VOTER</option>
+      <option>CANDIDATE</option>
+    </select>
+    <button onclick="load()">Search</button>
+  </div>
+
+  <table>
+    <thead>
+      <tr><th>Email</th><th>Current Role</th><th>Change To</th><th>Action</th></tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+
+<script>
+  function goBack() {
+    window.location.href = '/voter_homepage.html';
+  }
+
+  async function load(){
+    const role = document.getElementById('filterRole').value;
+    const search = document.getElementById('search').value.trim();
+    const params = new URLSearchParams();
+    if(role) params.set('role', role);
+    if(search) params.set('search', search);
+    const res = await fetch('/admin/users?'+params.toString());
+    const users = await res.json();
+    const tbody = document.getElementById('tbody');
+    tbody.innerHTML = '';
+    users.forEach(u=>{
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${u.email}</td>
+        <td><span class="chip">${u.role}</span></td>
+        <td>
+          <select data-email="${u.email}">
+            <option ${u.role==='VOTER'?'selected':''}>VOTER</option>
+            <option ${u.role==='CANDIDATE'?'selected':''}>CANDIDATE</option>
+          </select>
+        </td>
+        <td><button data-email="${u.email}">Save</button></td>
+      `;
+      tr.querySelector('button').onclick = async (e)=>{
+        const email = e.target.getAttribute('data-email');
+        const role = tr.querySelector('select').value;
+        e.target.disabled = true;
+        const r = await fetch(`/admin/users/${encodeURIComponent(email)}/role`,{
+          method:'PATCH',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ role })
+        });
+        const out = await r.json();
+        alert(out.message || out.error || 'Done');
+        e.target.disabled = false;
+        load();
+      };
+      tbody.appendChild(tr);
+    });
+  }
+  load();
+</script>
+</body>
+</html>

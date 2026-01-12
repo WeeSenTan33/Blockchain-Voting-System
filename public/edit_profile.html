@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Edit Candidate Profile</title>
+  <style>
+    body { font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; }
+    input, button { width: 100%; padding: 10px; margin-top: 10px; }
+    img { width: 150px; margin-top: 10px; display: block; border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <h2>Candidate Profile Setup</h2>
+  
+  <input id="matric" disabled />
+  <input id="name" placeholder="Name" />
+  <input id="course" placeholder="Course" />
+
+  <label>Profile Picture:</label>
+  <input type="file" id="profileInput" accept="image/*" />
+  <img id="profilePreview" style="display:none" />
+
+  <label>Manifesto Poster:</label>
+  <input type="file" id="manifestoInput" accept="image/*" />
+  <img id="manifestoPreview" style="display:none" />
+
+  <button onclick="submit()">Save</button>
+  <p id="status"></p>
+
+  <script>
+    const email = localStorage.getItem('voterEmail');
+    const no_matric = email.split('@')[0];
+    document.getElementById('matric').value = no_matric;
+
+    let profileBase64 = null;
+    let manifestoBase64 = null;
+
+    document.getElementById('profileInput').addEventListener('change', (e) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        profileBase64 = reader.result;
+        const img = document.getElementById('profilePreview');
+        img.src = profileBase64;
+        img.style.display = 'block';
+      };
+      reader.readAsDataURL(e.target.files[0]);
+    });
+
+    document.getElementById('manifestoInput').addEventListener('change', (e) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        manifestoBase64 = reader.result;
+        const img = document.getElementById('manifestoPreview');
+        img.src = manifestoBase64;
+        img.style.display = 'block';
+      };
+      reader.readAsDataURL(e.target.files[0]);
+    });
+
+    async function submit() {
+      const name = document.getElementById('name').value;
+      const course = document.getElementById('course').value;
+
+      const res = await fetch('/candidate/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email, name, course,
+          profileImage: profileBase64,
+          manifestoImage: manifestoBase64
+        })
+      });
+
+      const data = await res.json();
+      document.getElementById('status').innerText = data.message || data.error;
+    }
+  </script>
+</body>
+</html>

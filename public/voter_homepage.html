@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Voter Homepage</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #B6CEB4, #D9E9CF);
+      color: #111827;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 60px;
+      background-color: #ffffff;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .logo img {
+      height: 75px;
+      width: auto;
+    }
+
+    .logo-text {
+      font-size: 50px;
+      font-weight: 750;
+      color: #1f2937;
+    }
+
+    .welcome-text {
+      font-size: 16px;
+      color: #4b5563;
+      margin-top: 4px;
+    }
+
+    .user-dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .dropbtn {
+      background-color: transparent;
+      color: #4b5563;
+      font-size: 16px;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+      font-family: inherit;
+    }
+
+    .dropbtn:hover {
+      color: #2563eb;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: #ffffff;
+      min-width: 160px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      z-index: 1;
+      right: 0;
+    }
+
+    .dropdown-content a {
+      color: #1f2937;
+      padding: 10px 16px;
+      text-decoration: none;
+      display: block;
+    }
+
+    .dropdown-content a:hover {
+      background-color: #f3f4f6;
+    }
+
+    .user-dropdown:hover .dropdown-content {
+      display: block;
+    }
+
+    .main {
+      display: block;           
+      padding: 40px 60px;       
+      text-align: left;          
+    }
+
+    .content {
+      max-width: 500px;
+      display: flex;       
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .container {
+      background-color: rgba(255, 255, 255, 0.4); /* Light transparent background */
+      border: 1px solid #111827;                  /* Dark border around the box */
+      border-radius: 40px;                        /* Very rounded corners */
+      padding: 40px;                              /* Space inside the box */
+      
+      /* This aligns items inside the box */
+      display: flex;
+      flex-direction: column;
+      gap: 20px;                                  /* Space between status and buttons */
+      width: fit-content;                         /* Box only grows as wide as needed */
+      min-width: 350px;
+    }
+
+    .button-group {
+      display: flex;
+      flex-direction: column;   
+      gap: 15px;        
+    }
+
+    .btn {
+      width: 180px;
+      text-align: center;
+      align-self: flex-start;
+      background-color: #2563eb;
+      color: white;
+      padding: 14px 28px;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn:hover {
+      background-color: #1e40af;
+    }
+
+    .poster {
+      position: absolute;
+      right: 60px;   /* Matches your header padding */
+      top: 150px;     /* Aligns with the top of your "Welcome" text */
+      width: 70%;    /* Fills the empty right side */
+      max-width: 875px;
+      z-index: 1;    /* Ensures it stays behind popups */
+    }
+
+    .poster img {
+      width: 100%;
+      height: auto;
+      border-radius: 25px; /* Matches your container theme */
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      display: block;
+    }
+
+    .popup-overlay {
+      display: none; /* Hidden by default */
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(5px); /* Creates the blur effect */
+      z-index: 1000;
+      justify-content: center; align-items: center;
+    }
+
+    .popup-content {
+      background: white;
+      width: 90%;
+      max-width: 500px;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid #111827;
+      animation: popIn 0.3s ease-out;
+    }
+
+    .popup-header {
+      background: #374151;
+      color: white;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .close-button { 
+      background:none; 
+      border:none; 
+      color:white; 
+      cursor:pointer; 
+      font-size:20px; 
+    }
+
+    .popup-body { 
+      padding: 25px; 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center;
+      gap: 12px; 
+    }
+
+    .capture-btn {
+      background-color: #2563eb; 
+      color: white;
+      font-weight: 600;
+      font-size: 16px;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px; 
+      cursor: pointer;
+      transition: background-color 0.2s ease-in-out; 
+      width: 100%; 
+      max-width: 300px; 
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
+    }
+
+    .capture-btn:hover {
+      background-color: #1d4ed8; 
+    }
+
+    .capture-btn:active {
+      background-color: #1e40af; 
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); 
+      transform: translateY(1px); 
+    }
+
+    #status {
+      margin-top: 12px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="logo">
+      <img src="/image/Logo_UPNM.png" alt="UPNM Logo">
+      <span class="logo-text">SPMPP</span>
+    </div>
+  
+    <div class="user-dropdown">
+      <button class="dropbtn" id="emailBtn">email@upnm.edu.my ▾</button>
+      <div class="dropdown-content">
+        <a href="#" onclick="logout()">Log out</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="main">
+    <div class="content">
+      <h1>Welcome, Voter</h1>
+      <p id="status">Checking your verification status…</p>
+
+      <div class="container">
+        <div class="button-group">
+          <button id="voteBtn" class="btn">Go to Voting</button>
+          <button class="btn" id="viewResults">View Results</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="poster">
+      <img src="/image/Poster.png" alt="Poster">
+    </div>
+  </div>
+
+  <div id="ekycPopup" class="popup-overlay">
+    <div class="popup-content" style="max-width: 500px;">
+      <div class="popup-header">
+        <span id="ekycTitle">eKYC 1: Matric Card Verification</span>
+        <button class="close-button" onclick="closeEKYC()">X</button>
+      </div>
+
+      <div class="popup-body" style="text-align: center;">
+        <video id="ekycVideo" width="100%" autoplay playsinline style="border-radius: 8px; background: #000;"></video>
+        <canvas id="ekycCanvas" style="display: none;"></canvas>
+        
+        <button class="capture-btn" id="captureBtn" onclick="captureStep1()" style="margin-top: 15px;">Capture Matric Card</button>
+        <p id="ekycStatus" style="font-size: 13px; margin-top: 10px;"></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      const userEmail = localStorage.getItem('voterEmail');
+
+      if (userEmail) {
+          window.history.pushState(null, null, window.location.href);
+          window.onpopstate = function() {
+            localStorage.clear();
+            window.location.replace('/login.html');
+          };
+      } else {
+          // If they aren't logged in, send them to login immediately
+          window.location.replace('/login.html');
+      }
+    })();
+
+    const email = localStorage.getItem('voterEmail');
+    const role  = localStorage.getItem('userRole') || 'VOTER';
+    let ekycStream = null;
+
+    if (email) {
+      document.getElementById('emailBtn').textContent = `${email} ▾`;
+    }
+
+    // Role Guard
+    if (role !== 'VOTER') {
+      window.location.href = role === 'ADMIN' ? '/admin_homepage.html'
+                         : role === 'CANDIDATE' ? '/candidate_homepage.html'
+                         : '/voter_homepage.html';
+    }
+
+    function goToVoting() {
+      window.location.href = '/voting.html?email=' + encodeURIComponent(email);
+    }
+
+    function logout() {
+      localStorage.clear();
+      window.location.replace('/login.html');
+    }
+
+    async function openEKYC() {
+        document.getElementById('ekycPopup').style.display = 'flex';
+        try {
+            ekycStream = await navigator.mediaDevices.getUserMedia({ video: true });
+            document.getElementById('ekycVideo').srcObject = ekycStream;
+        } catch (err) {
+            alert("Camera access denied. Please enable camera permissions.");
+        }
+    }
+
+    function closeEKYC() {
+        if (ekycStream) {
+            ekycStream.getTracks().forEach(track => track.stop());
+        }
+        document.getElementById('ekycPopup').style.display = 'none';
+    }
+
+    async function captureStep1() {
+        const video = document.getElementById('ekycVideo');
+        const canvas = document.getElementById('ekycCanvas');
+        const status = document.getElementById('ekycStatus');
+
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0);
+        const imageData = canvas.toDataURL('image/jpeg');
+
+        status.innerText = "⏳ Uploading Matric Card...";
+
+        const res = await fetch('/upload/matric_card', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, image: imageData })
+        });
+
+        const data = await res.json();
+        if (data.success) {
+            document.getElementById('ekycTitle').innerText = "eKYC 2: Selfie Verification";
+            const btn = document.getElementById('captureBtn');
+            btn.innerText = "Capture Selfie";
+            btn.onclick = captureStep2; // Switches to second step
+            status.innerText = "✅ Matric Uploaded! Now take a selfie.";
+        } else {
+            status.innerText = "❌ " + (data.error || "Upload failed");
+        }
+    }
+
+    async function captureStep2() {
+        const video = document.getElementById('ekycVideo');
+        const canvas = document.getElementById('ekycCanvas');
+        const status = document.getElementById('ekycStatus');
+
+        canvas.getContext('2d').drawImage(video, 0, 0);
+        const imageData = canvas.toDataURL('image/jpeg');
+
+        status.innerText = "⏳ Verifying Selfie...";
+
+        const res = await fetch('/upload/selfie', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, image: imageData })
+        });
+
+        const data = await res.json();
+        if (data.success) {
+            alert("eKYC Complete! Waiting for admin approval.");
+            location.reload();
+        } else {
+            status.innerText = "❌ " + (data.error || "Verification failed");
+        }
+    }
+
+    async function loadStatus() {
+      try {
+        const res = await fetch('/voter/status', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+        const data = await res.json();
+        const statusEl = document.getElementById('status');
+        const voteBtn  = document.getElementById('voteBtn');
+
+        if (!data.success) { statusEl.textContent = data.error || 'Unable to check status.'; return; }
+
+        switch (data.next) {
+          case 'VOTING_ALLOWED':
+            statusEl.textContent = '✅ Verified — you may vote.';
+            voteBtn.disabled = false;
+            break;
+          case 'EKYC_PENDING':
+            statusEl.textContent = '⏳ eKYC submitted. Please wait for admin to verify.';
+            break;
+          case 'NOT_SUBMITTED':
+            statusEl.textContent = '⚠️ Please complete your eKYC to vote.';
+            break;
+          case 'ACCESS_DENIED':
+            statusEl.textContent = '❌ Your verification was rejected by admin.';
+            break;
+          case 'ALREADY_VOTED':
+            statusEl.textContent = '🗳️ You have already voted. Thank you!';
+            break;
+          default:
+            statusEl.textContent = 'Unknown status.';
+        }
+      } catch {
+        document.getElementById('status').textContent = 'Error checking status.';
+      }
+    }
+
+    document.getElementById('voteBtn').onclick = async () => {
+      try {
+        const res = await fetch('/voter/status', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+        const data = await res.json();
+        if (!data.success) {
+          alert('Error: ' + (data.error || 'Unable to check status.'));
+          return;
+        }
+
+        switch (data.next) {
+          case 'VOTING_ALLOWED':
+            window.location.href = '/voting.html?email=' + encodeURIComponent(email);
+            break;
+          case 'NOT_SUBMITTED':
+            alert('⚠️ Please complete your eKYC before voting.');
+            openEKYC();
+            break;
+          case 'EKYC_PENDING':
+            alert('⏳ Your eKYC is still pending approval by the admin.');
+            break;
+          case 'ACCESS_DENIED':
+            alert('❌ Your eKYC was rejected by admin. Please reupload your eKYC.');
+            openEKYC();
+            break;
+          case 'ALREADY_VOTED':
+            alert('🗳️ You have already voted. Thank you!');
+            break;
+          default:
+            alert('⚠️ Unknown status.');
+        }
+
+      } catch (err) {
+        console.error(err);
+        alert('Failed to check voting eligibility.');
+      }
+    };
+
+    document.getElementById('viewResults').onclick = () => window.location.href = '/votingResult.html';
+
+    loadStatus();
+  </script>
+</body>
+</html>
