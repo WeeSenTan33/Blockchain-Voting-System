@@ -6,7 +6,7 @@ const pool = mysql.createPool({
   host: process.env.DB_HOST || 'localhost',
   user: process.env.DB_USER || 'root',
   password: process.env.DB_PASSWORD || '',
-  database: 'spmpp', // This is your now-consolidated database name
+  database: 'spmpp',
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0

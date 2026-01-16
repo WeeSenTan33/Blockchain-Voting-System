@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta charset="UTF-8" />
   <title>Candidate Homepage</title>
   <style>
@@ -353,6 +354,101 @@
       margin-top: 12px;
       font-size: 16px;
     }
+
+    @media screen and (max-width: 1024px) {
+    html, body {
+      overflow-x: hidden;
+      width: 100%;
+      position: relative;
+    }
+
+    header {
+    padding: 10px;
+    flex-direction: row; 
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: nowrap; 
+    width: 100vw;
+    max-width: 100%;
+    box-sizing: border-box;
+    }
+
+    .logo-text { 
+      font-size: 20px;
+    }
+
+    .logo img { 
+      height: 40px;
+    }
+
+    .user-dropdown { 
+      max-width: 50%; 
+    }
+
+    .dropbtn {
+      font-size: 11px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: block;
+      padding: 5px;
+    }
+
+    .main {
+      padding: 20px 10px;
+      width: 100%;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .content {
+      text-align: center;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h1 { 
+      font-size: 28px; 
+      margin-bottom: 10px; 
+    }
+
+    /* 5. Container & Buttons: Full width and centered */
+    .container {
+      width: 90% !important;
+      max-width: 100%;
+      min-width: 0 !important; 
+      margin: 15px auto; 
+      padding: 20px;
+      border-radius: 20px;
+      box-sizing: border-box;
+    }
+
+    .btn {
+      width: 100% !important; 
+      padding: 12px;
+      align-self: center;
+    }
+
+    /* 6. Poster: Move from side to bottom */
+    .poster {
+      position: static !important;
+      width: 90% !important;
+      margin: 20px auto !important;
+    }
+
+    .popup-content {
+      width: 95%;
+      max-height: 95vh;
+    }
+
+    .upload-grid { 
+      grid-template-columns: 1fr; 
+    }
+  }
   </style>
 </head>
 

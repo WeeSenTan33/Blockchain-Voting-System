@@ -133,7 +133,7 @@ app.post('/auth/request-otp', async (req, res) => {
   const { email } = req.body;
   console.log("📩 OTP requested for:", email);
 
-  if (!email.endsWith('@alfateh.upnm.edu.my')) {
+  if (!email.endsWith('@alfateh.upnm.edu.my') && !email.endsWith('@upnm.edu.my')) {
     return res.status(400).json({ success: false, error: 'Must use Alfateh email' });
   }
 

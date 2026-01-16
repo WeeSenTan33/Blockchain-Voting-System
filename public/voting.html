@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta charset="UTF-8">
   <title>Vote for Your Candidate</title>
   <style>
@@ -117,6 +118,63 @@
       border-radius: 12px;
       box-shadow: 0 0 20px rgba(0,0,0,0.5);
     }
+
+    @media screen and (max-width: 1024px) {
+    /* 1. Allow the page to scroll vertically */
+    html, body {
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+      height: auto !important;
+    }
+
+    /* 2. Reset the container to allow vertical stacking */
+    .container {
+      height: auto !important;
+      padding: 10px;
+    }
+
+    h1 {
+      font-size: 24px;
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    /* 3. Change scroll-container to a standard vertical column */
+    .scroll-container {
+      flex-direction: column !important;
+      overflow-x: hidden !important;
+      gap: 16px;
+      height: auto !important;
+    }
+
+    .card {
+      flex: 0 0 auto !important; /* Overwrites the 33% width */
+      width: 100% !important;
+      margin: 0 auto;
+      padding: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    /* 5. Adjust image heights so the button is easy to find */
+    .profile-pic {
+      width: 80px;
+      height: 100px;
+    }
+
+    .manifesto {
+      height: auto !important;
+      max-height: 450px; /* Prevents the image from being infinitely long */
+      margin-top: 15px;
+    }
+
+    /* 6. Make the vote button large and easy to tap */
+    .vote-btn {
+      width: 100%;
+      padding: 15px;
+      font-size: 16px;
+      margin-top: 15px;
+    }
+  }
   </style>
 </head>
 <body>
